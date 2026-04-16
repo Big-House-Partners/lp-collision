@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1897,6 +1898,29 @@ h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.1; }
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--gray-900);
+    }
+    @media (max-width: 767px) {
+      .lp-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--sp-4);
+      }
+      .lp-header .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .lp-hero__cta-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .lp-hero__cta-row .btn,
+      .lp-hero__cta-row a {
+        width: 100%;
+        justify-content: center;
+      }
+      .spot-card__thumb-title {
+        font-size: var(--text-sm);
+      }
     }
     /* Broadcast-style visual cue bar */
     .broadcast-bar {
