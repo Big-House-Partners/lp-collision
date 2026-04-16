@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TV Spots for Collision Centers — Big House Partners</title>
+  <meta name="description" content="Professionally produced TV commercials for Certified Collision Centers. Customized with your brand and ready to go.">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    body {
+      background: #ffffff;
+      color: var(--black);
+    }
+    .lp-header {
+      background: var(--black);
+      padding: var(--sp-5) var(--gutter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray-900);
+    }
+    /* Broadcast-style visual cue bar */
+    .broadcast-bar {
+      background: var(--red);
+      padding: var(--sp-3) var(--gutter);
+      display: flex;
+      gap: var(--sp-6);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .broadcast-item {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      white-space: nowrap;
+    }
+    .broadcast-item::before { content: '▶'; font-size: 8px; }
+    /* Spot preview cards */
+    .spots-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--sp-5);
+    }
+    @media (min-width: 640px) {
+      .spots-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .spots-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .spot-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      overflow: hidden;
+      transition: border-color var(--t-base);
+    }
+    .spot-card:hover { border-color: var(--red); }
+    .spot-card--paper {
+      background: #fbfaf8;
+      border-color: rgba(18,18,18,0.1);
+    }
+    .spot-card--paper .spot-card__name {
+      color: var(--black);
+    }
+    .spot-card--paper .spot-card__desc {
+      color: rgba(18,18,18,0.68);
+    }
+    .spot-card__thumb {
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #1e1e1e, #0a0a0a);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .spot-card--video {
+      cursor: pointer;
+      transition: border-color var(--t-fast), transform var(--t-base), box-shadow var(--t-base);
+    }
+    .spot-card--video:hover,
+    .spot-card--video:focus-within,
+    .spot-card--video.is-active {
+      border-color: rgba(200,32,12,0.45);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+    }
+    .spot-card--video .spot-card__thumb iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+      transition: transform var(--t-base);
+    }
+    .spot-card--video:hover .spot-card__thumb iframe,
+    .spot-card--video:focus-within .spot-card__thumb iframe,
+    .spot-card--video.is-active .spot-card__thumb iframe {
+      transform: scale(1.02);
+    }
+    .spot-card__play {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(200,32,12,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--t-base);
+    }
+    .spot-card:hover .spot-card__play { transform: scale(1.1); }
+    .spot-card__play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      background: linear-gradient(180deg, rgba(10,10,10,0.08) 0%, rgba(10,10,10,0.34) 100%);
+      transition: opacity var(--t-fast), transform var(--t-fast);
+    }
+    .spot-card__play-button {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(200,32,12,0.92);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.34);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--t-base), background var(--t-fast);
+    }
+    .spot-card--video:hover .spot-card__play-button,
+    .spot-card--video:focus-within .spot-card__play-button {
+      transform: scale(1.08);
+      background: var(--red);
+    }
+    .spot-card__duration {
+      position: absolute;
+      bottom: var(--sp-3);
+      right: var(--sp-3);
+      background: rgba(0,0,0,0.75);
+      color: rgba(255,255,255,0.7);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      padding: 2px 8px;
+      letter-spacing: 0.06em;
+      z-index: 3;
+    }
+    .spot-card__body {
+      padding: var(--sp-5);
+    }
+    .spot-card__name {
+      font-family: var(--font-ui);
+      font-size: var(--text-base);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--white);
+      margin-bottom: var(--sp-2);
+    }
+    .spot-card__desc {
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.45);
+      line-height: 1.55;
+      margin-bottom: var(--sp-4);
+    }
+    .spot-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(var(--sp-4), 4vw, var(--sp-10));
+      background: rgba(6, 6, 6, 0.92);
+    }
+    .spot-lightbox.is-open {
+      display: flex;
+    }
+    .spot-lightbox__backdrop {
+      position: absolute;
+      inset: 0;
+    }
+    .spot-lightbox__dialog {
+      position: relative;
+      width: min(1100px, 100%);
+      z-index: 1;
+    }
+    .spot-lightbox__close {
+      position: absolute;
+      top: -48px;
+      right: 0;
+      color: var(--white);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: var(--sp-2) 0;
+    }
+    .spot-lightbox__player {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+      border: 1px solid var(--gray-800);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    }
+    .spot-lightbox__player iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .spot-lightbox__title {
+      margin-top: var(--sp-4);
+      color: rgba(255,255,255,0.8);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    /* What's included */
+    .included-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--sp-4);
+    }
+    @media (min-width: 640px) {
+      .included-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .included-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-4);
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.65);
+      line-height: 1.55;
+    }
+    .included-item::before {
+      content: '✓';
+      color: var(--red);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .section--paper {
+      background: #ffffff;
+      color: var(--black);
+      border-top: 1px solid #e7e1d8 !important;
+    }
+    .section--paper .heading-xl,
+    .section--paper .heading-md,
+    .section--paper .process-step__title,
+    .section--paper .faq-trigger,
+    .section--paper .included-item {
+      color: var(--black) !important;
+    }
+    .section--paper p,
+    .section--paper .process-step__desc,
+    .section--paper .faq-answer__inner {
+      color: rgba(18,18,18,0.72) !important;
+    }
+    .section--paper .process-step,
+    .section--paper .faq-item {
+      border-top-color: rgba(18,18,18,0.12);
+    }
+    .section--paper .value-item--dark {
+      background: #fbfaf8;
+      color: var(--black);
+      border-color: rgba(18,18,18,0.1);
+    }
+    /* Multi-location callout */
+    .multi-loc {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-left: 3px solid var(--red);
+      padding: var(--sp-8);
+    }
+    /* Price display */
+    .price-start {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      color: var(--white);
+      line-height: 1;
+    }
+    .price-start sup {
+      font-family: var(--font-body);
+      font-size: var(--text-xl);
+      font-weight: 400;
+      color: var(--gray-500);
+      vertical-align: super;
+      font-size: 1.5rem;
+    }
+    .lp-form-section {
+      background: #ffffff;
+      padding: clamp(var(--sp-16), 8vw, var(--sp-24)) var(--gutter);
+      border-top: 1px solid #e7e1d8;
+    }
+    .lp-form-inner {
+      max-width: 640px;
+      margin-inline: auto;
+    }
+    .lp-form-section .heading-xl {
+      color: var(--black) !important;
+    }
+    .lp-form-section p,
+    .lp-form-section .form-label,
+    .lp-form-section .form-note {
+      color: rgba(18,18,18,0.72) !important;
+    }
+    .lp-form-section .form-input,
+    .lp-form-section .form-textarea,
+    .lp-form-section .form-select {
+      background: #fbfaf8;
+      border-color: rgba(18,18,18,0.14);
+      color: var(--black);
+    }
+    .lp-form-section .form-input::placeholder,
+    .lp-form-section .form-textarea::placeholder {
+      color: rgba(18,18,18,0.42);
+    }
+    .lp-form-section .radio-option label {
+      background: #fbfaf8;
+      border-color: rgba(18,18,18,0.12);
+      color: rgba(18,18,18,0.78);
+    }
+    .lp-form-section .radio-option input:checked + label {
+      background: rgba(200,32,12,0.08);
+      border-color: rgba(200,32,12,0.38);
+      color: var(--black);
+    }
+    .sticky-cta {
+      display: none;
+    }
+    @media (max-width: 767px) {
+      .sticky-cta {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        background: var(--red);
+        padding: var(--sp-4) var(--gutter);
+        text-align: center;
+      }
+      .sticky-cta a {
+        color: var(--white);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="lp-header">
+  <a href="../index.html" class="nav-logo">BIG HOUSE <span>PARTNERS</span></a>
+  <a href="#collision-form" class="btn btn--primary" style="font-size:var(--text-xs);">Choose Your Spot →</a>
+</header>
+
+<div class="broadcast-bar">
+  <span class="broadcast-item">Ready for TV</span>
+  <span class="broadcast-item">Streaming &amp; CTV</span>
+  <span class="broadcast-item">Social Media</span>
+  <span class="broadcast-item">Customized for Your Shop</span>
+</div>
+
+<!-- ── HERO ── -->
+<section class="lp-hero" aria-labelledby="cc-hero-heading">
+  <div class="container">
+    <div class="lp-hero__content" style="max-width:720px;">
+      <span class="lp-hero__tag">Certified Collision Centers</span>
+      <h1 id="cc-hero-heading" class="lp-hero__headline">
+        Custom High-Quality<br>
+        TV Spots.<br>
+        <span style="color:var(--red);">Ready to Go.</span>
+      </h1>
+      <p class="lp-hero__sub">
+        Professionally produced commercials for Certified Collision Centers. Customized with your brand and ready to go. No long timelines. No big production costs. Just great work, ready when you are.
+      </p>
+      <div class="lp-hero__cta-row">
+        <a href="#spots" class="btn btn--primary btn--lg btn-arrow">See the Spots</a>
+        <a href="#cc-how-heading" class="btn btn--outline-white" style="font-size:var(--text-xs);">How It Works</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section section--paper" aria-labelledby="cc-how-heading">
+  <div class="container">
+    <div class="lp-split">
+      <div>
+        <span class="label label--red mb-4" style="display:block;">A Simpler Way to Get on Air</span>
+        <h2 id="cc-how-heading" class="heading-xl" style="margin-bottom:var(--sp-6);">We've already done the heavy lifting.</h2>
+        <p style="font-size:var(--text-base); line-height:1.7; margin-bottom:var(--sp-8);">These spots are fully produced, professionally shot, and ready to go. We customize them with your logo, location details, and voiceover so you get high-end creative without the time or cost of starting from scratch.</p>
+        <div class="process-list" style="max-width:480px;">
+          <div class="process-step">
+            <span class="process-step__num">01</span>
+            <div><p class="process-step__title">Choose your spot</p><p class="process-step__desc">Browse the available spots and pick the one that fits your shop's personality</p></div>
+          </div>
+          <div class="process-step">
+            <span class="process-step__num">02</span>
+            <div><p class="process-step__title">Send us your logo and details</p><p class="process-step__desc">We handle the rest — no production coordination required on your end</p></div>
+          </div>
+          <div class="process-step">
+            <span class="process-step__num">03</span>
+            <div><p class="process-step__title">We customize and deliver</p><p class="process-step__desc">Your branded version is finalized and delivered ready for TV, streaming, and digital. That's it.</p></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <!-- Why it makes sense box -->
+        <div style="background:#fbfaf8; padding:var(--sp-8); border-top:3px solid var(--red); border:1px solid rgba(18,18,18,0.1);">
+          <p style="font-family:var(--font-ui); font-size:var(--text-lg); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--black); margin-bottom:var(--sp-6);">Why it makes sense</p>
+          <ul class="value-list">
+            <li class="value-item value-item--dark">Proven, professional creative — already made</li>
+            <li class="value-item value-item--dark">Less lift than starting from scratch</li>
+            <li class="value-item value-item--dark">Lower cost than starting from scratch</li>
+            <li class="value-item value-item--dark">Built to work across TV, digital, and social</li>
+            <li class="value-item value-item--dark">Optional media buying and placement support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── AVAILABLE SPOTS ── -->
+<section id="spots" class="section section--dark" style="border-top:1px solid var(--gray-900);" aria-labelledby="spots-heading">
+  <div class="container">
+    <span class="label label--red mb-4" style="display:block;">Available Spots</span>
+    <h2 id="spots-heading" class="heading-xl" style="color:var(--white); margin-bottom:var(--sp-4);">Choose your commercial.</h2>
+    <p style="font-size:var(--text-base); color:rgba(255,255,255,0.4); margin-bottom:var(--sp-10); max-width:520px; line-height:1.65;">2–4 professionally produced spots, ready to be customized with your branding. Pick the one that fits your shop.</p>
+
+    <div class="spots-grid">
+      <button class="spot-card spot-card--video fade-up" type="button" data-video-src="https://player.vimeo.com/video/796466890?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" data-video-title="Factory Certified" aria-label="Open Factory Certified spot in larger player">
+        <div class="spot-card__thumb">
+          <iframe src="https://player.vimeo.com/video/796466890?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" title="Factory Certified preview" tabindex="-1" aria-hidden="true"></iframe>
+          <span class="spot-card__play-overlay" aria-hidden="true">
+            <span class="spot-card__play-button" aria-hidden="true">
+              <svg width="22" height="24" viewBox="0 0 16 18" fill="none"><path d="M1 1L15 9L1 17V1Z" fill="white"/></svg>
+            </span>
+          </span>
+          <span class="spot-card__duration">:30</span>
+        </div>
+        <div class="spot-card__body">
+          <p class="spot-card__name">Spot A — Factory Certified</p>
+          <p class="spot-card__desc">A polished, trust-forward collision-center spot built to reinforce certified expertise and professional quality.</p>
+          <span class="btn btn--primary btn-arrow" style="width:100%; justify-content:center; font-size:var(--text-xs); display:inline-flex;">Preview Spot</span>
+        </div>
+      </button>
+      <button class="spot-card spot-card--video fade-up" type="button" data-video-src="https://player.vimeo.com/video/796466867?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" data-video-title="To the Beat" aria-label="Open To the Beat spot in larger player">
+        <div class="spot-card__thumb">
+          <iframe src="https://player.vimeo.com/video/796466867?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" title="To the Beat preview" tabindex="-1" aria-hidden="true"></iframe>
+          <span class="spot-card__play-overlay" aria-hidden="true">
+            <span class="spot-card__play-button" aria-hidden="true">
+              <svg width="22" height="24" viewBox="0 0 16 18" fill="none"><path d="M1 1L15 9L1 17V1Z" fill="white"/></svg>
+            </span>
+          </span>
+          <span class="spot-card__duration">:30</span>
+        </div>
+        <div class="spot-card__body">
+          <p class="spot-card__name">Spot B — To the Beat</p>
+          <p class="spot-card__desc">A rhythmic, high-energy spot designed to make your shop feel active, memorable, and ready for market.</p>
+          <span class="btn btn--primary btn-arrow" style="width:100%; justify-content:center; font-size:var(--text-xs); display:inline-flex;">Preview Spot</span>
+        </div>
+      </button>
+      <button class="spot-card spot-card--video fade-up" type="button" data-video-src="https://player.vimeo.com/video/1183541504?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" data-video-title="Bing Bang Bash" aria-label="Open Bing Bang Bash spot in larger player">
+        <div class="spot-card__thumb" style="background:linear-gradient(135deg,#2a0a05,#0e0404);">
+          <iframe src="https://player.vimeo.com/video/1183541504?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" title="Bing Bang Bash preview" tabindex="-1" aria-hidden="true"></iframe>
+          <span class="spot-card__play-overlay" aria-hidden="true">
+            <span class="spot-card__play-button" aria-hidden="true">
+              <svg width="22" height="24" viewBox="0 0 16 18" fill="none"><path d="M1 1L15 9L1 17V1Z" fill="white"/></svg>
+            </span>
+          </span>
+          <span class="spot-card__duration">:15</span>
+        </div>
+        <div class="spot-card__body">
+          <p class="spot-card__name">Spot C — Bing Bang Bash</p>
+          <p class="spot-card__desc">A punchier short-form cut built for quick impact across digital placements, streaming, and social.</p>
+          <span class="btn btn--primary btn-arrow" style="width:100%; justify-content:center; font-size:var(--text-xs); display:inline-flex;">Preview Spot</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT'S INCLUDED ── -->
+<section class="section section--paper">
+  <div class="container">
+    <div class="lp-split" style="align-items:start;">
+      <div>
+        <span class="label label--red mb-6" style="display:block;">What's Included</span>
+        <h2 class="heading-xl" style="margin-bottom:var(--sp-4);">Everything you need. Nothing you don't.</h2>
+        <p style="font-size:var(--text-base); line-height:1.65; max-width:520px; margin-bottom:var(--sp-10);">Once you choose a spot, we customize it for your shop and deliver finished files ready for the channels you need.</p>
+      </div>
+      <div style="background:#fbfaf8; padding:var(--sp-8); border-top:3px solid var(--red); border:1px solid rgba(18,18,18,0.1);">
+        <p style="font-size:var(--text-xs); font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--red); margin-bottom:var(--sp-2);">Spots start at</p>
+        <p class="price-start" style="color:var(--black);"><sup>$</sup>5,000</p>
+        <p style="font-size:var(--text-sm); color:rgba(18,18,18,0.68); line-height:1.65; margin-top:var(--sp-3);">No production surprises. No hidden costs. Built to give collision centers a polished on-air presence without a full custom production process.</p>
+      </div>
+    </div>
+    <div class="included-grid">
+      <div class="included-item">Customized version of your chosen spot(s)</div>
+      <div class="included-item">Updated logo and branding throughout</div>
+      <div class="included-item">Voiceover tailored to your market</div>
+      <div class="included-item">Final files ready for broadcast and digital</div>
+      <div class="included-item">Multi-format delivery (TV, streaming, social)</div>
+      <div class="included-item">A simpler production path for busy operators</div>
+    </div>
+
+    <!-- Optional add-on -->
+    <div style="margin-top:var(--sp-10); padding:var(--sp-6); background:#fbfaf8; border:1px solid rgba(200,32,12,0.2);">
+      <p style="font-family:var(--font-ui); font-size:var(--text-base); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--black); margin-bottom:var(--sp-3);">Optional: Media Buying &amp; Placement</p>
+      <p style="font-size:var(--text-sm); color:rgba(18,18,18,0.68); line-height:1.65;">Need help placing your ads? We can manage targeted campaigns across CTV and social to make sure your spot gets seen by the right audience. Simple, efficient, and built to get results.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── BUILT FOR ── -->
+<section class="section section--paper">
+  <div class="container">
+    <div class="lp-split">
+      <div>
+        <span class="label label--red mb-6" style="display:block;">Best Fit For</span>
+        <h2 class="heading-xl" style="margin-bottom:var(--sp-8);">Best fit for collision centers that:</h2>
+        <ul class="value-list">
+          <li class="value-item value-item--dark">Want to look more polished and professional on air</li>
+          <li class="value-item value-item--dark">Need advertising quickly, without a long production timeline</li>
+          <li class="value-item value-item--dark">Don't want to manage a full production company</li>
+          <li class="value-item value-item--dark">Are ready to stand out in their market</li>
+          <li class="value-item value-item--dark">Want advertising that actually looks like it belongs on TV</li>
+        </ul>
+      </div>
+      <div class="multi-loc" style="background:#fbfaf8; border-color:rgba(18,18,18,0.1);">
+        <p style="font-family:var(--font-ui); font-size:var(--text-lg); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--black); margin-bottom:var(--sp-4);">For Multi-Location Operators</p>
+        <p style="font-size:var(--text-base); color:rgba(18,18,18,0.68); line-height:1.7; margin-bottom:var(--sp-5);">Managing multiple shops? We can customize and scale these spots across locations, keeping your brand consistent while adapting for each market.</p>
+        <a href="#collision-form" class="btn btn--outline-dark btn-arrow" style="font-size:var(--text-xs);">Ask About Multi-Location</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section class="section section--paper">
+  <div class="container">
+    <div class="lp-split">
+      <div>
+        <span class="label label--red mb-4" style="display:block;">FAQ</span>
+        <h2 class="heading-xl">Quick Answers</h2>
+      </div>
+      <div class="faq-list" style="max-width:none; width:100%;">
+        <div class="faq-item open">
+          <button class="faq-trigger" aria-expanded="true">How quickly can we get started? <span class="faq-icon">×</span></button>
+          <div class="faq-answer"><div class="faq-answer__inner">Once you choose a spot and send us your materials, we move quickly to customize and deliver your final files. Exact timing depends on the scope and any market-specific needs.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">Can we request changes? <span class="faq-icon">+</span></button>
+          <div class="faq-answer"><div class="faq-answer__inner">We customize branding and voiceover as part of every package. Additional edits can be discussed on a per-project basis.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">Where can we use these spots? <span class="faq-icon">+</span></button>
+          <div class="faq-answer"><div class="faq-answer__inner">TV, streaming, social, and digital platforms. Final files are delivered in all relevant formats for your intended use.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">Do you handle media buying? <span class="faq-icon">+</span></button>
+          <div class="faq-answer"><div class="faq-answer__inner">Yes — it's an optional add-on. We offer media buying support across streaming, CTV, and social to help you reach the right audience in your market.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FORM ── -->
+<section id="collision-form" class="lp-form-section">
+  <div class="lp-form-inner">
+    <span class="label label--red mb-4" style="display:block;">Get Started</span>
+    <h2 class="heading-xl" style="margin-bottom:var(--sp-4);">Pick a commercial. We'll take care of the rest.</h2>
+    <p style="font-size:var(--text-base); margin-bottom:var(--sp-10); line-height:1.65;">Tell us which spot caught your attention and a little about your shop. We'll reach out to get you started.</p>
+
+    <form class="form" data-validate action="#" method="POST">
+      <div class="form-row form-row--2">
+        <div class="form-field">
+          <label class="form-label" for="cc-name">Your Name <span style="color:var(--red);">*</span></label>
+          <input class="form-input" type="text" id="cc-name" name="name" required placeholder="First &amp; last" autocomplete="name">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="cc-shop">Shop Name <span style="color:var(--red);">*</span></label>
+          <input class="form-input" type="text" id="cc-shop" name="shop" required placeholder="Your collision center" autocomplete="organization">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="cc-email">Email <span style="color:var(--red);">*</span></label>
+        <input class="form-input" type="email" id="cc-email" name="email" required placeholder="you@yourshop.com" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="cc-spot">Which spot caught your eye?</label>
+        <select class="form-select" id="cc-spot" name="spot">
+          <option value="">Select a spot...</option>
+          <option>Spot A</option>
+          <option>Spot B</option>
+          <option>Spot C</option>
+          <option>Not sure yet — show me the options</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="cc-locations">How many locations?</label>
+        <div class="radio-group">
+          <div class="radio-option"><input type="radio" name="locations" id="loc-1" value="1"><label for="loc-1">1</label></div>
+          <div class="radio-option"><input type="radio" name="locations" id="loc-3" value="2-3"><label for="loc-3">2–3</label></div>
+          <div class="radio-option"><input type="radio" name="locations" id="loc-plus" value="4+"><label for="loc-plus">4+</label></div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="cc-msg">Anything else?</label>
+        <textarea class="form-textarea" id="cc-msg" name="message" placeholder="Market, timeline, or any questions" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn--primary btn--lg btn-arrow" style="width:100%; justify-content:center;">Request Your Spot</button>
+      <p class="form-note" style="text-align:center;">We'll reach out within one business day. Spots start at $5,000.</p>
+    </form>
+  </div>
+</section>
+
+<div class="sticky-cta">
+  <a href="#collision-form">Choose Your Spot →</a>
+</div>
+
+<div class="spot-lightbox" id="spot-lightbox" aria-hidden="true">
+  <div class="spot-lightbox__backdrop" data-lightbox-close></div>
+  <div class="spot-lightbox__dialog" role="dialog" aria-modal="true" aria-labelledby="spot-lightbox-title">
+    <button class="spot-lightbox__close" type="button" data-lightbox-close>Close ×</button>
+    <div class="spot-lightbox__player" id="spot-lightbox-player"></div>
+    <p class="spot-lightbox__title" id="spot-lightbox-title"></p>
+  </div>
+</div>
+
+<footer style="background:var(--black); border-top:1px solid var(--gray-900); padding:var(--sp-6) var(--gutter);">
+  <div style="max-width:var(--max-w); margin-inline:auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-4);">
+    <a href="../index.html" class="nav-logo" style="font-size:1rem;">BIG HOUSE <span>PARTNERS</span></a>
+    <p style="font-size:var(--text-xs); color:var(--gray-700);">© 2025 Big House Partners LLC — Produced by national agency and production professionals</p>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script>
+  const spotLightbox = document.getElementById('spot-lightbox');
+  const spotLightboxPlayer = document.getElementById('spot-lightbox-player');
+  const spotLightboxTitle = document.getElementById('spot-lightbox-title');
+  const spotCards = document.querySelectorAll('.spot-card--video');
+
+  const closeSpotLightbox = () => {
+    spotLightbox.classList.remove('is-open');
+    spotLightbox.setAttribute('aria-hidden', 'true');
+    spotLightboxPlayer.innerHTML = '';
+    spotCards.forEach((card) => card.classList.remove('is-active'));
+  };
+
+  spotCards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const src = card.dataset.videoSrc;
+      const title = card.dataset.videoTitle || '';
+      if (!src) return;
+
+      spotCards.forEach((item) => item.classList.remove('is-active'));
+      card.classList.add('is-active');
+
+      const autoplaySrc = src + (src.includes('?') ? '&autoplay=1' : '?autoplay=1');
+      spotLightboxPlayer.innerHTML = '<iframe src="' + autoplaySrc + '" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" title="' + title + '"></iframe>';
+      spotLightboxTitle.textContent = title;
+      spotLightbox.classList.add('is-open');
+      spotLightbox.setAttribute('aria-hidden', 'false');
+    });
+  });
+
+  spotLightbox.querySelectorAll('[data-lightbox-close]').forEach((trigger) => {
+    trigger.addEventListener('click', closeSpotLightbox);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && spotLightbox.classList.contains('is-open')) {
+      closeSpotLightbox();
+    }
+  });
+</script>
+</body>
+</html>
